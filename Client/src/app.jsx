@@ -19,6 +19,7 @@ class App extends React.Component{
 
   search(story) {
     console.log(story + ' topic was searched')
+    $('#inputbox').val('');
     $.ajax({
       url: '/topics',
       method: 'POST',

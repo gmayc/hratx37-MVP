@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/stories');
+// mongoose.connect('mongodb://localhost:27017/stories');
 // var Schema = mongoose.Schema;
 
 let storySchema = mongoose.Schema({

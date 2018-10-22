@@ -1,7 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const nytStories = require('../helpers/nytStories');
-const db = require('../database/mongo');
+// const db = require('../database/mongo');
+const db = require('../database/dbSequelize');
 
 const app = express();
 
@@ -22,14 +23,16 @@ app.post('/topics', (req, res) => {
       console.log(err);
     } else {
       // console.log(data.results[0].multimedia[4].url, '<<<<<<< data from server');
-        db.save(data.results, (er, data) => {
-          if (err) {
-            throw err;
-          } else {
-            // console.log(data);
-            // res.send(JSON.stringify(data));
-          }
-        });
+      data.results.forEach(story => {
+        db.save(story);
+      });
+          // if (err) {
+          //   throw err;
+          // } else {
+          //   // console.log(data);
+          //   // res.send(JSON.stringify(data));
+          // }
+        // });
     }
   });
 
@@ -40,13 +43,13 @@ app.post('/topics', (req, res) => {
 
 app.get('/topics', (req, res) => {
 
-  db.retrieve((err,data) => {
-    if (err) {
-      console.log(err);
-    }else {
-      res.send(JSON.stringify(data));
-    }
-  });
+  // db.retrieve((err,data) => {
+  //   if (err) {
+  //     console.log(err);
+  //   }else {
+  //     res.send(JSON.stringify(data));
+  //   }
+  // });
 });
 
 app.listen(3000, () => {

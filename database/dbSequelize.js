@@ -8,14 +8,14 @@ const db = new Sequelize('stories', 'root', '', {
 
 
 
-// db
-//   .authenticate()
-//   .then(() => {
-//     console.log('connection to db successful!!!');
-//   })
-//   .catch(() => {
-//     console.log(err);
-//   })
+db
+  .authenticate()
+  .then(() => {
+    console.log('connection to db successful!!!');
+  })
+  .catch(() => {
+    console.log(err);
+  })
 
 
 let Story = db.define('Story', {
@@ -27,8 +27,6 @@ let Story = db.define('Story', {
   published: Sequelize.STRING,
   mediaUrl: Sequelize.STRING,
   mediaCaption: Sequelize.STRING,
-
-
 },
 {
   freezeTableName: true,
@@ -38,7 +36,7 @@ let Story = db.define('Story', {
 
 let Author = db.define('Author', {
   authorId:  { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
-  name: Sequelize.STRING,
+  name: { type: Sequelize.STRING, allowNull: false, unique: true },
 },
 {
   freezeTableName: true,
@@ -57,35 +55,43 @@ let Section = db.define('Section', {
   updatedAt: false
 });
 
-// Section.hasMany(Author);
-Section.belongsTo(Story, {
+
+Author.belongsToMany(Story, {
+  through: Section,
   foreignKey: 'story_id'
 });
-var counter = 0;
+Story.belongsToMany(Author, {
+  through: Section,
+  foreignKey: 'author_id'
+});
+
+
 let save = (entry) => {
   return db.sync()
+  
   .then(() => {
-
     return Promise.all([
-      Story.create({
-      section: entry.section,
-      title: entry.title,
-      abstract: entry.abstract,
-      url: entry.url,
-      published: entry.published_date,
-      mediaUrl: entry.multimedia[4].url,
-      mediaCaption: entry.multimedia[4].caption
-      }),
+      
       Author.create({
         name: entry.byline,
       }),
+      Story.create({
+        section: entry.section,
+        title: entry.title,
+        abstract: entry.abstract,
+        url: entry.url,
+        published: entry.published_date,
+        mediaUrl: entry.multimedia[4].url,
+        mediaCaption: entry.multimedia[4].caption
+      }),
       Section.create({
       })
-    ]);
+    ]).then(() => {
+      // Author.addStory(Story, { through: { status: 'started' }});
+    });
   })
   .then(()=> {
-    // Section.hasMany(Author);
-    // Section.belongsTo(Story);
+  
   })
   .catch((err) => {
     console.log(err);
